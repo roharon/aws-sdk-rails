@@ -135,7 +135,11 @@ module Aws
         # Set accessible attributes after merged options.
         def set_attributes(options)
           options.each_key do |opt_name|
-            instance_variable_set("@#{opt_name}", options[opt_name])
+            value = options[opt_name] 
+            if opt_name == :queue
+              value = value.merge(default: ENV["AWS_ACTIVE_JOB_QUEUE_URL"] || value[:default])
+            end
+            instance_variable_set("@#{opt_name}", value)
             client.config.user_agent_frameworks << 'aws-sdk-rails' if opt_name == :client
           end
         end
